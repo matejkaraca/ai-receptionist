@@ -25,23 +25,28 @@ class Prijava(BaseModel):
     telefon: str
     opis: str
 
+ class Upit(BaseModel):
+    datum: str
+
+
 
 @app.get("/")
 def pocetna():
     return {"status":"Ana je Online"}
 
-@app.get("/slots")
-def slobodni_termini(datum: str):
+@app.post("/slots")
+def slobodni_termini(podaci: Upit):
     svi_termini = ["09:00", "11:00", "14:00", "17:00"]
 
-    rezervacije = supabase.table("appointments").select("vrijeme").eq("datum", datum).eq("status", "booked").execute()
+    rezervacije = supabase.table("appointments").select("vrijeme").eq("datum", podaci.datum).eq("status", "booked").execute()
 
     zauzeti = [r["vrijeme"][:5] for r in rezervacije.data]
 
     slobodni = [t for t in svi_termini if t not in zauzeti]
 
-    return {"datum": datum, "slobodni_termini": slobodni}
+    return {"datum": podaci.datum, "slobodni_termini": slobodni}
 
+    
 @app.post("/book")
 def rezerviraj(podaci: Rezervacija):
     postojeci = supabase.table("customers").select("*").eq("telefon", podaci.telefon).execute()
