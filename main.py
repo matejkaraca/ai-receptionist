@@ -25,7 +25,7 @@ class Prijava(BaseModel):
     telefon: str
     opis: str
 
- class Upit(BaseModel):
+class Upit(BaseModel):
     datum: str
 
 
@@ -46,7 +46,7 @@ def slobodni_termini(podaci: Upit):
 
     return {"datum": podaci.datum, "slobodni_termini": slobodni}
 
-    
+
 @app.post("/book")
 def rezerviraj(podaci: Rezervacija):
     postojeci = supabase.table("customers").select("*").eq("telefon", podaci.telefon).execute()
