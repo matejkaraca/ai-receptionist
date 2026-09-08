@@ -68,17 +68,18 @@ def rezerviraj(podaci: Rezervacija):
         "opis": podaci.opis
     }).execute()
 
-    try:
-        httpx.post(os.getenv("N8N_WEBHOOK_URL"), json={
-            "ime": podaci.ime,
-            "telefon": podaci.telefon,
-            "datum": podaci.datum,
-            "vrijeme": podaci.vrijeme,
-            "opis": podaci.opis
-        }, timeout=5)
-    except Exception as e:
-        print(f"n8n webhook nije uspio: {e}")
-
+try:
+    r = httpx.post(os.getenv("N8N_WEBHOOK_URL"), json={
+        "ime": podaci.ime,
+        "telefon": podaci.telefon,
+        "datum": podaci.datum,
+        "vrijeme": podaci.vrijeme,
+        "opis": podaci.opis
+    }, timeout=5)
+    print(f"n8n odgovor: {r.status_code} - {r.text}")
+except Exception as e:
+    print(f"n8n webhook nije uspio: {e}")
+   
     return {
         "status": "rezervirano",
         "ime": podaci.ime,
