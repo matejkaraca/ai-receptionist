@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
 from supabase import create_client
+import httpx
 
 load_dotenv ()
 
@@ -66,6 +67,17 @@ def rezerviraj(podaci: Rezervacija):
         "vrijeme": podaci.vrijeme,
         "opis": podaci.opis
     }).execute()
+
+    try:
+        httpx.post(os.getenv("N8N_WEBHOOK_URL"), json={
+            "ime": podaci.ime,
+            "telefon": podaci.telefon,
+            "datum": podaci.datum,
+            "vrijeme": podaci.vrijeme,
+            "opis": podaci.opis
+        }, timeout=5)
+    except Exception as e:
+        print(f"n8n webhook nije uspio: {e}")
 
     return {
         "status": "rezervirano",
